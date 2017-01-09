@@ -13,55 +13,25 @@ The output consists of two files:
 1. A data file (in NumPy's native format) containing the model's learned parameters.
 2. A Python class that constructs the model's graph.
 
-### LeNet Example
+### Examples
 
-This example showns you how to finetune code from the [Caffe MNIST tutorial](http://caffe.berkeleyvision.org/gathered/examples/mnist.html) using Tensorflow.
-First, you can convert a prototxt model to tensorflow code:
-
-    $ ./convert.py examples/mnist/lenet.prototxt --code-output-path=mynet.py
-
-This produces tensorflow code for the LeNet network in `mynet.py`. The code can be imported as described below in the Inference section. Caffe-tensorflow also lets you convert `.caffemodel` weight files to `.npy` files that can be directly loaded from tensorflow:
-
-    $ ./convert.py examples/mnist/lenet.prototxt --caffemodel examples/mnist/lenet_iter_10000.caffemodel --data-output-path=mynet.npy
-
-The above command will generate a weight file named `mynet.npy`.
-
-#### Inference:
-
-Once you have generated both the code weight files for LeNet, you can finetune LeNet using tensorflow with
-
-    $ ./examples/mnist/finetune_mnist.py
-
-At a high level, `finetune_mnist.py` works as follows:
-
-```python
-# Import the converted model's class
-from mynet import MyNet
-
-# Create an instance, passing in the input data
-net = MyNet({'data':my_input_data})
-
-with tf.Session() as sesh:
-    # Load the data
-    net.load('mynet.npy', sesh)
-    # Forward pass
-    output = sesh.run(net.get_output(), ...)
-```
-
-### ImageNet example
-
-See `test.py` for a functioning example. It verifies the sample models (under `examples/`) against the ImageNet validation set.
+See the [examples](examples/) folder for more details.
 
 ## Verification
 
-The following converted models have been verified on the ILSVRC2012 validation set.
+The following converted models have been verified on the ILSVRC2012 validation set using
+[validate.py](examples/imagenet/validate.py).
 
-| Model                                          | Top 5 Accuracy |
-|:-----------------------------------------------|---------------:|
-| [VGG 16](http://arxiv.org/abs/1409.1556)       |         89.88% |
-| [GoogLeNet](http://arxiv.org/abs/1409.4842)    |         89.06% |
-| [CaffeNet](http://arxiv.org/abs/1408.5093)     |         79.93% |
-| [AlexNet](http://goo.gl/3BilWd)                |         79.84% |
+| Model                                                 | Top 5 Accuracy |
+|:------------------------------------------------------|---------------:|
+| [ResNet 152](http://arxiv.org/abs/1512.03385)         |         92.92% |
+| [ResNet 101](http://arxiv.org/abs/1512.03385)         |         92.63% |
+| [ResNet 50](http://arxiv.org/abs/1512.03385)          |         92.02% |
+| [VGG 16](http://arxiv.org/abs/1409.1556)              |         89.88% |
+| [GoogLeNet](http://arxiv.org/abs/1409.4842)           |         89.06% |
+| [Network in Network](http://arxiv.org/abs/1312.4400)  |         81.21% |
+| [CaffeNet](http://arxiv.org/abs/1408.5093)            |         79.93% |
+| [AlexNet](http://goo.gl/3BilWd)                       |         79.84% |
 
 ## Notes
 
@@ -80,3 +50,5 @@ The following converted models have been verified on the ILSVRC2012 validation s
 - Image rescaling can affect the ILSVRC2012 top 5 accuracy listed above slightly. VGG16 expects isotropic rescaling (anisotropic reduces accuracy to 88.45%) whereas BVLC's implementation of GoogLeNet expects anisotropic (isotropic reduces accuracy to 87.7%).
 
 - The support class `kaffe.tensorflow.Network` has no internal dependencies. It can be safely extracted and deployed without the rest of this library.
+
+- The ResNet model uses 1x1 convolutions with a stride of 2. This is currently only supported in the master branch of TensorFlow (the latest release at time of writing being v0.8.0, which does not support it).
