@@ -59,7 +59,7 @@ class Network(object):
                 try:
                     fed_layer = self.layers[fed_layer]
                 except KeyError:
-                    print self.layers.keys()
+                    print(self.layers.keys())
                     raise KeyError('Unknown layer name fed: %s' % fed_layer)
             self.inputs.append(fed_layer)
         return self
